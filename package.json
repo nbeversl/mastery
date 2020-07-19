@@ -1,0 +1,20 @@
+{
+  "name": "practice-asst-node",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "stay": "^0.1.0"
+  },
+  "dependencies": {
+    "loudness": "^0.3.0",
+    "prompt-sync": "^4.2.0",
+    "say": "^0.16.0",
+    "strip-ansi": "^6.0.0"
+  }
+}
