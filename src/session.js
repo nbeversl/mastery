@@ -207,8 +207,8 @@ class Session {
     getLeastRecentlyPracticed = (tasklist) => {
 
         return tasklist.sort ( (a,b) => {
-            
-            return a.status.sessions[-1][1] - b.status.sessions[-1][1];
+            console.log( a.status.sessions[a.status.sessions.length-1])
+            return a.status.sessions[a.status.sessions.length-1][1] - b.status.sessions[a.status.sessions.length-1][1];
         });
     }
 

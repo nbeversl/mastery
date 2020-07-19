@@ -56,10 +56,10 @@ class TaskManager {
                 case 'Reminder':
                     this.reminders.push(reloadedTask);
                     break;
-                case 'Warmup':
-                    this.tasks.push(reloadedTask);
-                    break;
-                case 'Task' :
+                // case 'Warmup':
+                //     this.tasks.push(reloadedTask);
+                //     break;
+                case 'Basic Task' :
                     this.tasks.push(reloadedTask);
                     break;
                 }
@@ -75,7 +75,7 @@ class TaskManager {
            'action': this.startSession,
            },
             { 	
-           'name': 'List new things I want to practice',
+           'name': 'Add Task',
            'action': this.addTask,
            },
            {

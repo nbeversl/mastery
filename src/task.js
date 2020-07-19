@@ -184,12 +184,14 @@ class Task {
 		console.log('Priority:\t\t' + this.status['priority']);
 		console.log('Time Remaining:\t\t'+this.status.time_to_done.join(', '));
 		console.log('Total time_practiced:\t'+convertSeconds(this.status.time_practiced));
-		console.log('Last Practiced:\t\t' + this.status.last_practiced);
+        console.log('Last Practiced:\t\t' + 
+                ( this.status.sessions.length == 1 ? 'never' 
+                : new Date(this.status.sessions[this.status.sessions.length-1][0])).toString());
 		console.log('Min Time:\t\t'+convertSeconds(this.settings.min_time));
 		console.log('Max Time:\t\t'+convertSeconds(this.settings.max_time));
 		console.log('Keywords:\t\t'+this.settings.keywords.join(', '));
 		var status = this.settings.active ? "Active" : "Not Active";
-		console.log('Status\t\t'+ status);
+		console.log('Status\t\t\t'+ status);
     }
 
 }
@@ -211,7 +213,7 @@ function pad(n, width, z) {
 
 nowInSeconds = () => {
     var s = new Date();
-    return s.getTime();
+    return s.getTime() * 1000; // UNIX
 }
 
 
