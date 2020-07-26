@@ -20,6 +20,7 @@ class TaskManager {
         this.warmups = [];
         if (! fs.existsSync(storageDir)) {
             fs.mkdirSync(storageDir);
+            console.log('Created task storage directory.')
         }
         this.taskTypes = {
             'Basic Task' : Task,
@@ -32,8 +33,8 @@ class TaskManager {
     loadTasks = () => {
 
         var files = fs.readdirSync(this.storageDir);
+        if ( files.length ==0 ) { this.talkToUser(); }
         files.forEach( (file) => {
-            if (file == '.DS_Store') { return }
             fs.readFile(path.join(this.storageDir, file), "utf8", (err,  contents) => {
                 if (err) { 
                     console.log(err); 
@@ -41,9 +42,15 @@ class TaskManager {
                 }
                 var args = JSON.parse(contents);
                 this.loadTask(args);
-                if (files.indexOf(file) + 1 == files.length) { this.talkToUser(); }
+                if (files.indexOf(file) + 1 == files.length) { 
+                    this.talkToUser(); 
+                }
                 });
             });
+        // if ( this.tasks.length == 0 ) { 
+        //     console.log('There are no tasks yet. Selection option 2 to get started.');
+        //     this.talkToUser(); 
+        // }
     }
 
     loadTask = (args) => {
@@ -67,7 +74,10 @@ class TaskManager {
     }
     
     talkToUser = () => {
-        	
+        if ( this.tasks.length == 0 ) { 
+            console.log('There are currently no tasks. Choose option 2 to get started.')
+        }
+
 		var actions = [
             {},
             { 
@@ -102,7 +112,7 @@ class TaskManager {
            console.log('Choose from one of thses.')
            return this.talkToUser();
        }
-
+       if ( choice == 5 ) { return }
        var action = actions[choice];
        if (action.action) {
            action.action();
