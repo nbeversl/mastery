@@ -18,18 +18,48 @@ class Session {
     start = () => {
 
         this.evalTasks();
-        this.organizeSession(this.seconds);
-
         if ( ! this.tasklist ) {
             console.log('There are not enough short tasks for this sessions.')
             return
         }
-        this.listSession();
-        console.log('Session length is ' + convertSeconds(this.totalSessionTime()));
-        this.runTask(0);
+
+        if ( this.seconds > 0 ) {
+            this.organizeSession(this.seconds);
+            this.listSession();
+            console.log('Session length is ' + convertSeconds(this.totalSessionTime()));
+            this.runTask(0);
+        } else {
+            this.justGo();
+        }
 
         this.reminders.forEach( (reminder) => {
             reminder.startReminding();
+        });
+
+    }
+    justGo = () => {
+        var mostRecentTime = this.getMostRecentSession();
+        if ( mostRecentTime < nowInSeconds() - 43200) {
+            if ( this.warmups ) {
+                var warmup = this.getLeastRecentlyPracticed(this.warmups)[0];    
+                warmup.randomizeSessionTime();
+                warmup.start( () => {
+                    warmup.save(this.storageDir);
+                    this.unlimitedTasks();
+                })
+            } 
+        }  else {
+            this.unlimitedTasks();
+        }
+    }
+
+    unlimitedTasks = () => {
+        var possibleTasks = this.getLeastRecentlyPracticed(this.tasks);
+        var nextTask = possibleTasks[0];
+        nextTask.randomizeSessionTime();
+        nextTask.start( () => {
+            nextTask.save(this.storageDir);   
+            this.unlimitedTasks();     
         });
     }
 
@@ -56,7 +86,7 @@ class Session {
             if ( task.settings.active ) {
                 tasks.push(task);
             }
-            if ( task.task_type == 'Warmup') {
+            if ( task.settings.task_type == 'Warmup') {
                 warmups.push(task);
             }
             
@@ -65,8 +95,14 @@ class Session {
         this.warmups = shuffle(warmups);
     }
 
-    organizeSession = (seconds) => {
+    getMostRecentSession = () => {
+        
+         var allTasks = this.getLeastRecentlyPracticed(this.tasks);
+         return allTasks[allTasks.length-1].mostRecentSessionTime();        
+    }
 
+    organizeSession = (seconds) => {
+      
         console.log(Object.keys(this.byKeyword).join(', '));
         const chosenKeywords = prompt('Focus on any keyword(s)? (comma-separated, leave blank for no preference): ');
         
@@ -92,26 +128,34 @@ class Session {
         } else {
             var possibleTasks = this.getLeastRecentlyPracticed(this.tasklist);
         }
+    
         var maxWarmupPercent = this.settings.maxWarmupPercent || 10;
         var maxWarmupTime = seconds * maxWarmupPercent * 0.01;
-        
+
+        // Determine whether to include warmups.
+        var mostRecentTime = this.getMostRecentSession();
+        console.log('Most recent practice was '+new Date(mostRecentTime).toString());
         var warmups = [];
-        var total = 0;
-        var possibleWarmups = this.getLeastRecentlyPracticed(this.warmups);
 
-        for (var i =0; i < this.warmups.length; i++) {
-            var warmup = this.warmups[i];
-            warmup.randomizeSessionTime();
-            warmups.push(warmup);
-            var total = warmups.reduce( (a,b)=> { a.this_time + b.this_time });
-            if ( total > maxWarmupTime ) { break }
+        if ( mostRecentTime < nowInSeconds() - 43200) {  // 12 hours
+            
+            var total = 0;
+            var possibleWarmups = this.getLeastRecentlyPracticed(this.warmups);    
+            for (var i =0; i < this.warmups.length; i++) {
+                var warmup = this.warmups[i];
+                warmup.randomizeSessionTime();
+                warmups.push(warmup);
+                if ( this.totalSessionTime() > maxWarmupTime ) { break }
+            }
+            seconds -= total;
+        } else {
+            console.log('Not including warmups')
         }
-
-        seconds -= total;
 
         this.tasklist = [];
 
         var i = 0;
+        
         while ( ( this.totalSessionTime() < seconds ) && ( i < possibleTasks.length ) ) {
 
             // As long as practice time remains, keep adding tasks
@@ -207,8 +251,7 @@ class Session {
     getLeastRecentlyPracticed = (tasklist) => {
 
         return tasklist.sort ( (a,b) => {
-            console.log( a.status.sessions[a.status.sessions.length-1])
-            return a.status.sessions[a.status.sessions.length-1][1] - b.status.sessions[a.status.sessions.length-1][1];
+            return a.status.sessions[a.status.sessions.length-1][1] - b.status.sessions[b.status.sessions.length-1][1];
         });
     }
 
@@ -279,6 +322,11 @@ const shuffle = (a) => {
         a[j] = x;
     }
     return a;
+}
+
+nowInSeconds = () => {
+    var s = new Date();
+    return s.getTime() * 1000; // UNIX
 }
 
 

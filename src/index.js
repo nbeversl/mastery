@@ -56,9 +56,9 @@ class TaskManager {
                 case 'Reminder':
                     this.reminders.push(reloadedTask);
                     break;
-                // case 'Warmup':
-                //     this.tasks.push(reloadedTask);
-                //     break;
+                case 'Warmup':
+                    this.tasks.push(reloadedTask);
+                    break;
                 case 'Basic Task' :
                     this.tasks.push(reloadedTask);
                     break;
@@ -104,18 +104,20 @@ class TaskManager {
        }
 
        var action = actions[choice];
-       if (action) {
+       if (action.action) {
            action.action();
+       } else {
+           console.log('Bye.')
        }
     }
     
     startSession = ( ) => {
         if (this.tasks.length == 0) {
-            console.log('There are no tasks set up. Make some tasks');
+            console.log('There are no tasks set up. Make some tasks.');
             return
         }
 
-        var minutes = parseInt(prompt('How much time (in minutes) do you have?'));
+        var minutes = this.getMinutes();
         var seconds = minutes * 60;
         var session = new Session({
             tasks : this.tasks,
@@ -126,6 +128,16 @@ class TaskManager {
             whenFinished: this.talkToUser.bind(this),
         });
         session.start();
+    }
+
+    getMinutes = () => {
+
+        var minutes = parseInt(prompt('Enter a length of time (in minutes), or <enter> to "just go".'));
+        if ( ! minutes ) {
+            console.log('Just going!');
+            return 0;
+        } 
+        return minutes;
     }
 
     reportTasks = () => {
@@ -140,13 +152,6 @@ class TaskManager {
             console.log('-----------------------------------');
             reminder.report();
         });
-        // console.log('WARMUPS');
-        // this.warmups.forEach( (warmup) => {
-        //     console.log('-----------------------------------');
-        //     warmup.report();
-        // });
-
-
         this.talkToUser();
 
     }
@@ -156,6 +161,12 @@ class TaskManager {
             console.log(this.tasks.indexOf(task) + 1 + ': ' + task.settings.name)
         });
         var selection = parseInt(prompt('Which task? : '));
+        if ( ! selection 
+            || selection >= this.tasks.length 
+            || selection < 1 ) {
+                console.log('Try again.')
+                this.editTask();
+            }
         this.tasks[selection-1].setup();
         this.tasks[selection-1].save(this.storageDir);
         this.talkToUser();
@@ -163,11 +174,16 @@ class TaskManager {
     addTask = () => {
 
         var typeNames = Object.keys(this.taskTypes);
-
         for(var i=1; i < typeNames.length +1; i++) {
             console.log(i.toString() + ' : ' + typeNames[i-1]); 
         }
         var selection = parseInt(prompt("which task type?"));
+        if (    ! selection 
+            || selection >= this.taskTypes.length 
+            || selection < 1 ) {
+                console.log('Try again.');
+                this.addTask();
+            }
         var taskType = typeNames[selection-1];
         var chosenClass = this.taskTypes[taskType];
         var newTask = new chosenClass();
@@ -179,23 +195,20 @@ class TaskManager {
   
 }
 
-
 sayThing = (message, callback) => {
 
     loudness.getVolume()
         .then( (vol) => {
-            loudness.setVolume(20);
+            loudness.setVolume(35);
             return vol
         })
         .then( (vol) => { 
-            say.speak(message);            
-            return vol
-        })
-        .then( (vol) => {
-            loudness.setVolume(vol);
-            if (callback) { callback(); }
+            say.speak(message, 'Alex', 1.2, () => {
+                loudness.setVolume(vol);
+                if (callback) { callback(); }
+            });            
+
         });
-        
 }
 
 s = new TaskManager('./task_status');

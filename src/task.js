@@ -87,10 +87,11 @@ class Task {
     }
 
     preQuestions() {
+
         this.settings.name = prompt(
                'Give this task a name: ' + 
                 ( this.settings.name ? '(' + this.settings.name +')' : '') 
-            ) || '' ;
+            ) || this.settings.name;
     }
 
     askQuestion(question, variable) {
@@ -109,9 +110,11 @@ class Task {
 
     start(callback)  {
         console.log('Task: '+this.settings.name+' for '+convertSeconds(this.this_time));
-        sayThing.sayThing(this.settings.name);
-        this.start_time = nowInSeconds();
-        this.practiceRoutine(this.this_time, callback);
+        sayThing.sayThing(this.settings.name + '. Press enter when ready to begin.', () => {
+            var wait = prompt('Press enter');
+            this.start_time = nowInSeconds();
+            this.practiceRoutine(this.this_time, callback);
+        });
     }
 
     practiceRoutine = (seconds, callback) => {
@@ -192,6 +195,10 @@ class Task {
 		console.log('Keywords:\t\t'+this.settings.keywords.join(', '));
 		var status = this.settings.active ? "Active" : "Not Active";
 		console.log('Status\t\t\t'+ status);
+    }
+    
+    mostRecentSessionTime = () => {
+        return this.status.sessions[this.status.sessions.length-1][1]
     }
 
 }
