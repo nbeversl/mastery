@@ -33,7 +33,7 @@ class TaskManager {
     loadTasks = () => {
 
         var files = fs.readdirSync(this.storageDir);
-        if ( files.length ==0 ) { this.talkToUser(); }
+        if ( files.length == 0 ) { return this.talkToUser(); }
         files.forEach( (file) => {
             fs.readFile(path.join(this.storageDir, file), "utf8", (err,  contents) => {
                 if (err) { 
@@ -43,7 +43,7 @@ class TaskManager {
                 var args = JSON.parse(contents);
                 this.loadTask(args);
                 if (files.indexOf(file) + 1 == files.length) { 
-                    this.talkToUser(); 
+                    return this.talkToUser(); 
                 }
                 });
             });
@@ -110,12 +110,11 @@ class TaskManager {
        }
        if ( choice == 5 ) { 
             console.log('Bye.')
-            return 
+            process.exit(0);
         }
        var action = actions[choice];
        if (action.action) {
            action.action();
-           this.talkToUser();
        } 
     }
     
