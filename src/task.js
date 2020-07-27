@@ -3,7 +3,6 @@ const say = require('say');
 var path = require('path');
 const fs = require('fs');
 const sayThing = require('./index.js');
-const { setMaxListeners } = require('process');
 
 class Task { 
 

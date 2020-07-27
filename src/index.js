@@ -71,7 +71,7 @@ class TaskManager {
     
     talkToUser = () => {
         if ( this.tasks.length == 0 ) { 
-            console.log('There are currently no tasks. Choose option 2 to get started.')
+            console.log('\n\nThere are currently no tasks. Choose option 2 to get started.\n\n')
         }
 
 		var actions = [
@@ -120,8 +120,7 @@ class TaskManager {
     
     startSession = ( ) => {
         if (this.tasks.length == 0) {
-            console.log('\n\nThere are no tasks set up. Make some tasks.\n\n');
-            return 
+            return this.talkToUser()
         }
 
         var minutes = this.getMinutes();
@@ -171,7 +170,7 @@ class TaskManager {
         if ( ! selection 
             || selection >= this.tasks.length 
             || selection < 1 ) {
-                console.log('Try again.')
+                console.log('\n\nTry again.\n\n')
                 this.editTask();
             }
         this.tasks[selection-1].setup();
@@ -188,7 +187,7 @@ class TaskManager {
         if (    ! selection 
             || selection >= this.taskTypes.length 
             || selection < 1 ) {
-                console.log('Try again.');
+                console.log('\n\nTry again.\n\n');
                 this.addTask();
             }
         var taskType = typeNames[selection-1];

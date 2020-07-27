@@ -104,7 +104,7 @@ class Session {
     }
 
     unlimitedTasks = () => {
-        var possibleTasks = this.getLeastRecentlyPracticed(this.tasks);
+        var possibleTasks = this.getLeastRecentlyPracticed(this.nonWarmupTasks);
         var nextTask = possibleTasks[0];
         nextTask.randomizeSessionTime();
         nextTask.start( () => {
@@ -132,11 +132,11 @@ class Session {
         // If there were no tasks matching the provided keyword(s), 
         // the task list becomes all tasks.
         if ( possibleTasks.length == 0 ) {
-             possibleTasks = this.tasks;
+             possibleTasks = this.nonWarmupTasks;
         }
      
         // Get user input for session priority
-        const build = prompt('Build session by: 1. highest priority , 2. even rotation: ');
+        const build = prompt('Build session by: \n1. highest priority , \n2. even rotation (default is 2):');
 
         if (build == '1') {
             possibleTasks = this.getHighestPriority(possibleTasks);
@@ -169,12 +169,11 @@ class Session {
         } else {
             console.log('Not including warmups')
         }
-
+    
         // As long as practice time and possible tasks remain, keep adding tasks
         var i = 0;
         
         while ( ( this.totalSessionTime() < seconds ) && ( i < possibleTasks.length ) ) {
-            console.log(this.sessionTasklist);
 
             var nextTask = possibleTasks[i];
             nextTask.randomizeSessionTime();
@@ -192,14 +191,18 @@ class Session {
                 }
             }
             i++;                        
-
         }
+
         if (this.totalSessionTime() < seconds) {
 
             var tasksByLength = this.elimDup(this.getLongest(this.sessionTasklist));
-            i = 0;
-            while (this.totalSessionTime() < seconds && i < tasksByLength.length) {
 
+            i = 0;
+            while ( 
+                    (this.totalSessionTime() < seconds) 
+                    && (i < tasksByLength.length)
+                )  {
+              
                 var nextTask = tasksByLength[i];
                 if (nextTask.settings.min_time < seconds - this.totalSessionTime()) {
                     this.sessionTasklist.push(nextTask);
@@ -214,7 +217,7 @@ class Session {
         // up to their maximum time per session.
         
         var allTasksMaxed = false;
-
+        
         while (this.totalSessionTime() < seconds && ! allTasksMaxed ) {
             this.sessionTasklist.forEach( (task) => {
                   if (task.this_time < task.settings.max_time) {
@@ -232,8 +235,7 @@ class Session {
         }
 
         this.sessionTasklist = shuffle(this.sessionTasklist);
-        
-        if (warmups != [] ) { this.sessionTasklist = warmups.concat(this.sessionTasklist); }
+        if (warmups.length > 0 ) { this.sessionTasklist = warmups.concat(this.sessionTasklist); }
     }
 
     runTask = (i) => {
