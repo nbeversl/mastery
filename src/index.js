@@ -115,13 +115,14 @@ class TaskManager {
        var action = actions[choice];
        if (action.action) {
            action.action();
+           this.talkToUser();
        } 
     }
     
     startSession = ( ) => {
         if (this.tasks.length == 0) {
             console.log('\n\nThere are no tasks set up. Make some tasks.\n\n');
-            return this.talkToUser();
+            return 
         }
 
         var minutes = this.getMinutes();
