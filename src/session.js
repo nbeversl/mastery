@@ -26,7 +26,7 @@ class Session {
         if ( this.seconds > 0 ) {
             this.organizeSession(this.seconds);
             this.listSession();
-            if ( ! this.tasklist ) {
+            if ( this.tasklist.length == 0 ) {
                 console.log('There are not enough short tasks for this sessions.')
                 return
             }
