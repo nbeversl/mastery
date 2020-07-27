@@ -47,10 +47,6 @@ class TaskManager {
                 }
                 });
             });
-        // if ( this.tasks.length == 0 ) { 
-        //     console.log('There are no tasks yet. Selection option 2 to get started.');
-        //     this.talkToUser(); 
-        // }
     }
 
     loadTask = (args) => {
@@ -112,19 +108,20 @@ class TaskManager {
            console.log('Choose from one of thses.')
            return this.talkToUser();
        }
-       if ( choice == 5 ) { return }
+       if ( choice == 5 ) { 
+            console.log('Bye.')
+            return 
+        }
        var action = actions[choice];
        if (action.action) {
            action.action();
-       } else {
-           console.log('Bye.')
-       }
+       } 
     }
     
     startSession = ( ) => {
         if (this.tasks.length == 0) {
-            console.log('There are no tasks set up. Make some tasks.');
-            return
+            console.log('\n\nThere are no tasks set up. Make some tasks.\n\n');
+            return this.talkToUser();
         }
 
         var minutes = this.getMinutes();
