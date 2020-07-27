@@ -26,13 +26,15 @@ class Session {
     // Run the session (practice)
     start = () => {
 
-        if ( this.tasks.length == 0 ) {
-            console.log('\n\nThere are no tasks set up yet.\n\n')
-            return this.whenFinished();
-        }
+        
 
         // Sort and organize tasks
         this.evalTasks();
+
+        if ( this.nonWarmupTasks.length == 0 ) {
+            console.log('\n\nThere are no non-warmup tasks set up yet.\n\n')
+            return this.whenFinished();
+        }
 
         // If a specific time length was chosen
         if ( this.seconds > 0 ) {
@@ -88,16 +90,15 @@ class Session {
 
 
     justGo = () => {
+        console.log('Just going!');
         var mostRecentTime = this.getMostRecentSession();
-        if ( mostRecentTime < nowInSeconds() - 43200) {
-            if ( this.warmups ) {
-                var warmup = this.getLeastRecentlyPracticed(this.warmups)[0];    
-                warmup.randomizeSessionTime();
-                warmup.start( () => {
-                    warmup.save(this.storageDir);
-                    this.unlimitedTasks();
-                })
-            } 
+        if ( mostRecentTime < nowInSeconds() - 43200 && this.warmups.length != 0 ) {
+            var warmup = this.getLeastRecentlyPracticed(this.warmups)[0];
+            warmup.randomizeSessionTime();
+            warmup.start( () => {
+                warmup.save(this.storageDir);
+                this.unlimitedTasks();
+            })
         }  else {
             this.unlimitedTasks();
         }

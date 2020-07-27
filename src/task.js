@@ -2,7 +2,6 @@ const prompt = require('prompt-sync')();
 const say = require('say');
 var path = require('path');
 const fs = require('fs');
-const sayThing = require('./index.js');
 
 class Task { 
 
@@ -61,28 +60,38 @@ class Task {
     }
     postQuestions() {
         
-            var keywords = prompt('Give this task some keywords, comma-separated: ' + 
-            ( this.settings.keywords ? '(' + this.settings.keywords.join(', ') + ')' : '') )
-                .toLowerCase().split(',') || this.settings.keywords;
+        var keywords = prompt('Give this task some keywords, comma-separated: ' + 
+        ( this.settings.keywords ? '(' + this.settings.keywords.join(', ') + ')' : '') )
+            .toLowerCase().split(',') || this.settings.keywords;
         
-            this.settings.keywords = [];
-            keywords.forEach ( (keyword) => {
-                this.settings.keywords.push(keyword.trim());
+        this.settings.keywords = [];
+        keywords.forEach ( (keyword) => {
+            this.settings.keywords.push(keyword.trim());
         });
 
-        this.settings.min_time = parseInt(
-            prompt('What is the minimum time needed in minutes? ' + 
-            ( this.settings.min_time ? '(' + ( this.settings.min_time / 60 )  +')' : ''))
-            ) * 60 || this.settings.min_time;
-    
-        this.settings.max_time = parseInt(
-            prompt('What is the maximum time you should work on this? ' + 
-            ( this.settings.max_time ? '(' + ( this.settings.max_time / 60 ) + ')' : '' ))) * 60 || this.settings.max_time;
+        this.getMinMaxTime();
  
         this.status.priority = parseInt(
             prompt('Give this task a priority from 1-5, 1 highest, 3 is neutral: ' 
             + ( this.status.priority ?  '(' + this.status.priority  + ')' : '')
             )) || this.status.priority;
+    }
+
+    getMinMaxTime () {
+
+        this.settings.min_time = parseInt(
+            prompt('What is the minimum time needed in minutes? ' + 
+            ( this.settings.min_time ? '(' + ( this.settings.min_time / 60 )  +') ' : ''))
+            ) * 60 || this.settings.min_time;
+    
+        this.settings.max_time = parseInt(
+            prompt('What is the maximum time you should work on this? ' + 
+            ( this.settings.max_time ? '(' + ( this.settings.max_time / 60 ) + ') ' : '' ))) * 60 || this.settings.max_time;
+
+        if (this.settings.min_time > this.settings.max_time) {
+            console.log('\nMinimum time must be less than the maximum time.\n\n')
+            return this.getMinMaxTime();
+        }
     }
 
     preQuestions() {
@@ -109,7 +118,7 @@ class Task {
 
     start(callback)  {
         console.log('Task: '+this.settings.name+' for '+convertSeconds(this.this_time));
-        sayThing.sayThing(this.settings.name + '. Press enter when ready to begin.', () => {
+        sayThing(this.settings.name + '. Press enter when ready to begin.', () => {
             var wait = prompt('Press enter');
             this.start_time = nowInSeconds();
             this.practiceRoutine(this.this_time, callback);
@@ -121,7 +130,7 @@ class Task {
         if ( seconds > 120 ) {
             setTimeout( () => {
                 console.log('One minute remaining');
-                sayThing.sayThing('One minute remaining');
+                sayThing('One minute remaining');
                 setTimeout( () => {
                     this.done(callback);
                 }, 60000);
@@ -145,7 +154,7 @@ class Task {
     }
 
     done = (callback) => {
-        sayThing.sayThing('Finished', () => {
+        sayThing('Finished', () => {
             this.finished_time = nowInSeconds();
             this.status.sessions = this.status.sessions || [];
             this.status.sessions.push([this.start_time, this.finished_time]);
@@ -222,5 +231,21 @@ nowInSeconds = () => {
     return s.getTime() * 1000; // UNIX
 }
 
+
+sayThing = (message, callback) => {
+
+    loudness.getVolume()
+        .then( (vol) => {
+            loudness.setVolume(35);
+            return vol
+        })
+        .then( (vol) => { 
+            say.speak(message, 'Alex', 1.2, () => {
+                loudness.setVolume(vol);
+                if (callback) { callback(); }
+            });            
+
+        });
+}
 
 module.exports = Task;

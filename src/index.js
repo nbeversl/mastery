@@ -20,7 +20,7 @@ class TaskManager {
         this.warmups = [];
         if (! fs.existsSync(storageDir)) {
             fs.mkdirSync(storageDir);
-            console.log('Created task storage directory.')
+            console.log('\nCreated task storage directory.')
         }
         this.taskTypes = {
             'Basic Task' : Task,
@@ -105,7 +105,7 @@ class TaskManager {
 
        var choice = prompt('What do you want to do?');
        if (! parseInt(choice) ||  0 > parseInt(choice) > actions.keys().length) {
-           console.log('Choose from one of thses.')
+           console.log('Choose from one of these.')
            return this.talkToUser();
        }
        if ( choice == 5 ) { 
@@ -140,7 +140,6 @@ class TaskManager {
 
         var minutes = parseInt(prompt('Enter a length of time (in minutes), or <enter> to "just go".'));
         if ( ! minutes ) {
-            console.log('Just going!');
             return 0;
         } 
         return minutes;
