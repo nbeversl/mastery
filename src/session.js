@@ -177,6 +177,9 @@ class Session {
         while ( ( this.totalSessionTime() < seconds ) && ( i < possibleTasks.length ) ) {
 
             var nextTask = possibleTasks[i];
+            if (nextTask.status.next_time.length) {
+                nextTask.this_time = nextTask.status.next_time
+            }
             nextTask.randomizeSessionTime();
             this.sessionTasklist.push(nextTask);
 

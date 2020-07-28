@@ -92,7 +92,7 @@ class TaskManager {
            'name': 'Get a report',
            'action': this.reportTasks,
            },
-            {
+           {
            'name': 'Quit',
            'action': null,
            }
@@ -167,12 +167,12 @@ class TaskManager {
         });
         var selection = parseInt(prompt('Which task? : '));
         if ( ! selection 
-            || selection >= this.tasks.length 
+            || selection > this.tasks.length 
             || selection < 1 ) {
                 console.log('\n\nTry again.\n\n')
                 this.editTask();
             }
-        this.tasks[selection-1].setup();
+        this.tasks[selection-1].setup(true);
         this.tasks[selection-1].save(this.storageDir);
         this.talkToUser();
     }
@@ -189,8 +189,10 @@ class TaskManager {
                 console.log('\n\nTry again.\n\n');
                 this.addTask();
             }
+
         var taskType = typeNames[selection-1];
         var chosenClass = this.taskTypes[taskType];
+
         var newTask = new chosenClass();
         newTask.settings.task_type = typeNames[selection-1];
         newTask.save(this.storageDir);

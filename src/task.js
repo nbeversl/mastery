@@ -29,7 +29,7 @@ class Task {
 				'priority':3,
 				'time_practiced' :0,
                 'sessions' : [[0,0]],
-                time_to_done : []
+                'next_time' : null,
             }
             this.setup();
         }
@@ -37,9 +37,11 @@ class Task {
     }
 
     setup(edit) {
-        if (edit) {
-            if ( ! this.isActive()) { return }
+        if (edit) {         
+           this.isActive();
         }
+        if (! this.settings.active) { return }
+ 
         this.preQuestions();
         this.questions();
         this.postQuestions();
@@ -47,17 +49,18 @@ class Task {
         this.status.next_session_amount = null;
     }
 
+
     isActive() {
 
         var status = this.settings.active ? 'Active' : 'Not Active';
         const change = prompt('This task is currently '+status+'. Do you want to switch it? (y/n)').toLowerCase();
         if ( change == 'y') {
             this.settings.active = ! this.settings.active;
-        } else {
-            return this.isActive();
-        }
-        return this.settings.active;
+        }         
+        var status = this.settings.active ? 'Active' : 'Not Active';
+        console.log('This task is now '+status);        
     }
+
     postQuestions() {
         
         var keywords = prompt('Give this task some keywords, comma-separated: ' + 
@@ -164,12 +167,20 @@ class Task {
 
     checkCompletion = (callback) => {
         console.log(this.settings.name);
-        console.log('Right now, how much more time do you think you will need')
-        console.log('before this task is mastered or completed? HH:MM, or just minutes.')
-        const untilCompleted = parseInt(prompt(''));
-        this.status.time_to_done = this.status.time_to_done || [];
-        this.status.time_to_done.push(untilCompleted);
-        callback();
+
+        console.log('How much time to you want to spend on this next time? (minutes)')
+        console.log('Press enter to keep the time ranges as set.')
+        const nextTime = parseInt(prompt(''));
+        if ( nextTime.trim() == "") { 
+            this.status.next_time = null;
+            return callback();             
+        }
+        if (! nextTime ) {
+            console.log('Try again.')
+            return this.checkCompletion();
+        }
+        this.status.next_time = nextTime * 60;
+        return callback();
     }
     
     save = (storageDir) => {
