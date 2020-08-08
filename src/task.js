@@ -2,6 +2,7 @@ const prompt = require('prompt-sync')();
 const say = require('say');
 var path = require('path');
 const fs = require('fs');
+const { parse } = require('path');
 
 class Task { 
 
@@ -170,11 +171,12 @@ class Task {
 
         console.log('How much time to you want to spend on this next time? (minutes)')
         console.log('Press enter to keep the time ranges as set.')
-        const nextTime = parseInt(prompt(''));
+        var nextTime = prompt('');
         if ( nextTime.trim() == "") { 
             this.status.next_time = null;
             return callback();             
         }
+        nextTime = parseInt(nextTime);
         if (! nextTime ) {
             console.log('Try again.')
             return this.checkCompletion();

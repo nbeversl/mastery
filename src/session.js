@@ -26,8 +26,6 @@ class Session {
     // Run the session (practice)
     start = () => {
 
-        
-
         // Sort and organize tasks
         this.evalTasks();
 
@@ -137,7 +135,7 @@ class Session {
         }
      
         // Get user input for session priority
-        const build = prompt('Build session by: \n1. highest priority , \n2. even rotation (default is 2):');
+        const build = prompt('Build session by: (1) highest priority or (2) even rotation (default is 2): ');
 
         if (build == '1') {
             possibleTasks = this.getHighestPriority(possibleTasks);
@@ -177,7 +175,7 @@ class Session {
         while ( ( this.totalSessionTime() < seconds ) && ( i < possibleTasks.length ) ) {
 
             var nextTask = possibleTasks[i];
-            if (nextTask.status.next_time.length) {
+            if (nextTask.status.next_time ) {
                 nextTask.this_time = nextTask.status.next_time
             }
             nextTask.randomizeSessionTime();
@@ -327,15 +325,15 @@ class Session {
 
 // from a list of tasks, return a dict with tasks organized by keyword
 sortTasksByKeyword = (tasks) => {
-
+    var sortedTasks = {}
     tasks.forEach( (task) => {
         task.settings.keywords.forEach( (keyword) => {
-            tasks[keyword] = tasks[keyword] || [];
-            tasks[keyword].push(task);
+            sortedTasks[keyword] = sortedTasks[keyword] || [];
+            sortedTasks[keyword].push(task);
         });
     });
 
-    return tasks;
+    return sortedTasks;
 }
 
 

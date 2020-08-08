@@ -138,7 +138,7 @@ class TaskManager {
 
     getMinutes = () => {
 
-        var minutes = parseInt(prompt('Enter a length of time (in minutes), or <enter> to "just go".'));
+        var minutes = parseInt(prompt('Enter a length of time (in minutes), or <enter> to "just go": '));
         if ( ! minutes ) {
             return 0;
         } 
