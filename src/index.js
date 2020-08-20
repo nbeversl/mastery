@@ -1,12 +1,11 @@
 const prompt = require('prompt-sync')();
-const say = require('say');
-const loudness = require('loudness');
-const Project = require('./project.js');
 const Task = require('./task.js');
 const Session = require('./session.js');
 const Reminder = require('./reminder.js');
+const KeyRotation = require('./key-rotation.js');
 const fs = require('fs');
 const path = require('path');
+
 
 class TaskManager {
 
@@ -26,6 +25,7 @@ class TaskManager {
             'Basic Task' : Task,
             'Reminder' : Reminder,
             'Warmup' : Task,
+            'Key Rotation' : KeyRotation,
         }
         this.loadTasks();
     }
@@ -63,6 +63,9 @@ class TaskManager {
                     this.tasks.push(reloadedTask);
                     break;
                 case 'Basic Task' :
+                    this.tasks.push(reloadedTask);
+                    break;
+                case 'Key Rotation' :
                     this.tasks.push(reloadedTask);
                     break;
                 }
@@ -202,21 +205,4 @@ class TaskManager {
   
 }
 
-sayThing = (message, callback) => {
-
-    loudness.getVolume()
-        .then( (vol) => {
-            loudness.setVolume(35);
-            return vol
-        })
-        .then( (vol) => { 
-            say.speak(message, 'Alex', 1.2, () => {
-                loudness.setVolume(vol);
-                if (callback) { callback(); }
-            });            
-
-        });
-}
-
 s = new TaskManager('./task_status');
-module.exports.sayThing = sayThing;

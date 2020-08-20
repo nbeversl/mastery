@@ -1,6 +1,5 @@
 const prompt = require('prompt-sync')();
-const sayThing = require('./index.js');
-
+const util = require ('./util.js')
 
 class Session {
 
@@ -44,7 +43,6 @@ class Session {
             if ( this.sessionTasklist.length == 0 ) {
                 console.log('\n\nThere are not enough tasks for this sessions.\n\n')
                 return this.whenFinished();
-                return
             }
 
             console.log('Session length is ' + convertSeconds(this.totalSessionTime()));
@@ -63,8 +61,6 @@ class Session {
 
     }
 
-    // Sort and organize the tasks passed from the main process.
-        
     evalTasks = () => {
 
         // Separate out warmups from non-warmups
@@ -82,7 +78,7 @@ class Session {
         // store a dict of all non-warmup tasks keyword
         this.byKeyword = sortTasksByKeyword(this.nonWarmupTasks);
 
-        // pre-shuffled the warmups
+        // pre-shuffle the warmups
         this.warmups = shuffle(this.warmups);
     }
 
@@ -90,7 +86,9 @@ class Session {
     justGo = () => {
         console.log('Just going!');
         var mostRecentTime = this.getMostRecentSession();
-        if ( mostRecentTime < nowInSeconds() - 43200 && this.warmups.length != 0 ) {
+        console.log(mostRecentTime);
+        console.log(util.nowInSeconds());
+        if ( mostRecentTime < util.nowInSeconds() - 43200 && this.warmups.length != 0 ) {
             var warmup = this.getLeastRecentlyPracticed(this.warmups)[0];
             warmup.randomizeSessionTime();
             warmup.start( () => {
@@ -149,7 +147,7 @@ class Session {
 
         // Determine whether to include warmups based on most recent session
         var warmups = [];
-        if ( mostRecentTime < nowInSeconds() - 43200) {  // 12 hours            
+        if ( mostRecentTime < util.nowInSeconds() - 43200) {  // 12 hours            
             
             // Determine available time for warmups
             var maxWarmupPercent = this.settings.maxWarmupPercent || 10;
@@ -364,11 +362,5 @@ const shuffle = (a) => {
     }
     return a;
 }
-
-nowInSeconds = () => {
-    var s = new Date();
-    return s.getTime() * 1000; // UNIX
-}
-
 
 module.exports = Session;

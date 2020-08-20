@@ -1,5 +1,5 @@
 const prompt = require('prompt-sync')();
-const sayThing = require('./index.js');
+const util = require('./util.js');
 const fs = require('fs');
 var path = require('path');
 
@@ -45,7 +45,7 @@ class Reminder {
         var offset = Math.floor(Math.random() * this.settings.frequency);
         this.interval = setTimeout(
             () => {
-                sayThing.sayThing(this.settings.message);
+                util.sayThing(this.settings.message);
                 this.startReminding();
             },
             (this.settings.frequency + offset) * 1000,

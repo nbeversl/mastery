@@ -3,6 +3,7 @@ const say = require('say');
 var path = require('path');
 const fs = require('fs');
 const { parse } = require('path');
+const util = require('./util.js');
 
 class Task { 
 
@@ -50,6 +51,13 @@ class Task {
         this.status.next_session_amount = null;
     }
 
+    timePracticed() {
+        var total = 0;
+        this.status.sessions.forEach( (session) => {
+            total += (session[1]  - session[0] )
+        })
+        return Math.round(total);
+    }
 
     isActive() {
 
@@ -122,9 +130,9 @@ class Task {
 
     start(callback)  {
         console.log('Task: '+this.settings.name+' for '+convertSeconds(this.this_time));
-        sayThing(this.settings.name + '. Press enter when ready to begin.', () => {
+        util.sayThing(this.settings.name + '. Press enter when ready to begin.', () => {            
             var wait = prompt('Press enter');
-            this.start_time = nowInSeconds();
+            this.start_time = util.nowInSeconds();
             this.practiceRoutine(this.this_time, callback);
         });
     }
@@ -134,7 +142,7 @@ class Task {
         if ( seconds > 120 ) {
             setTimeout( () => {
                 console.log('One minute remaining');
-                sayThing('One minute remaining');
+                util.sayThing('One minute remaining');
                 setTimeout( () => {
                     this.done(callback);
                 }, 60000);
@@ -158,8 +166,8 @@ class Task {
     }
 
     done = (callback) => {
-        sayThing('Finished', () => {
-            this.finished_time = nowInSeconds();
+        util.sayThing('Finished', () => {
+            this.finished_time = util.nowInSeconds();
             this.status.sessions = this.status.sessions || [];
             this.status.sessions.push([this.start_time, this.finished_time]);
             this.checkCompletion(callback);        
@@ -205,9 +213,11 @@ class Task {
         }
         console.log('Task Name:\t\t' +this.settings['name']);
 		console.log('Task Type:\t\t'+ this.settings['task_type']);
-		console.log('Priority:\t\t' + this.status['priority']);
-		console.log('Time Remaining:\t\t'+this.status.time_to_done.join(', '));
-		console.log('Total time_practiced:\t'+convertSeconds(this.status.time_practiced));
+        console.log('Priority:\t\t' + this.status['priority']);
+        if (this.status.time_to_done) {
+            console.log('Time Remaining:\t\t'+this.status.time_to_done.join(', '));
+        }
+		console.log('Total time_practiced:\t'+convertSeconds(this.timePracticed()));
         console.log('Last Practiced:\t\t' + 
                 ( this.status.sessions.length == 1 ? 'never' 
                 : new Date(this.status.sessions[this.status.sessions.length-1][0])).toString());
@@ -237,28 +247,5 @@ function pad(n, width, z) {
     n = n + '';
     return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
   }
-
-
-nowInSeconds = () => {
-    var s = new Date();
-    return s.getTime() * 1000; // UNIX
-}
-
-
-sayThing = (message, callback) => {
-
-    loudness.getVolume()
-        .then( (vol) => {
-            loudness.setVolume(35);
-            return vol
-        })
-        .then( (vol) => { 
-            say.speak(message, 'Alex', 1.2, () => {
-                loudness.setVolume(vol);
-                if (callback) { callback(); }
-            });            
-
-        });
-}
 
 module.exports = Task;
