@@ -21,5 +21,12 @@ sayThing = (message, callback) => {
         });
 }
 
+/* Zero-pad integers for track time display */
+function pad(n, width, z) {
+    z = z || '0';
+    n = n + '';
+    return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+  }
 
-module.exports = { nowInSeconds, sayThing };
+
+module.exports = { nowInSeconds, sayThing, pad };

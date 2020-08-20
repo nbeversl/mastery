@@ -36,6 +36,7 @@ class Task {
             this.setup();
         }
         this.this_time = 0;
+        
     }
 
     setup(edit) {
@@ -128,12 +129,15 @@ class Task {
 
     questions() { return }
 
-    start(callback)  {
+    start()  {
         console.log('Task: '+this.settings.name+' for '+convertSeconds(this.this_time));
-        util.sayThing(this.settings.name + '. Press enter when ready to begin.', () => {            
+        util.sayThing(this.settings.name + '. Press enter when ready to begin, or q to stop.', () => {            
             var wait = prompt('Press enter');
+            if (wait == 'q') {
+                return false
+            }
             this.start_time = util.nowInSeconds();
-            this.practiceRoutine(this.this_time, callback);
+            return this.practiceRoutine(this.this_time);
         });
     }
 
@@ -144,7 +148,7 @@ class Task {
                 console.log('One minute remaining');
                 util.sayThing('One minute remaining');
                 setTimeout( () => {
-                    this.done(callback);
+                    return this.done(callback);
                 }, 60000);
 
             }, (seconds - 60) * 1000 );
@@ -153,7 +157,6 @@ class Task {
                 this.done(callback);
             }, seconds*1000);
          }
-        
     }
 
     randomizeSessionTime = () => {
@@ -176,21 +179,20 @@ class Task {
 
     checkCompletion = (callback) => {
         console.log(this.settings.name);
-
         console.log('How much time to you want to spend on this next time? (minutes)')
         console.log('Press enter to keep the time ranges as set.')
         var nextTime = prompt('');
         if ( nextTime.trim() == "") { 
             this.status.next_time = null;
-            return callback();             
-        }
-        nextTime = parseInt(nextTime);
-        if (! nextTime ) {
-            console.log('Try again.')
-            return this.checkCompletion();
-        }
-        this.status.next_time = nextTime * 60;
-        return callback();
+        } else {
+            nextTime = parseInt(nextTime);
+            if (! nextTime ) {
+                console.log('Try again.')
+                return this.checkCompletion();
+            }
+            this.status.next_time = nextTime * 60;
+            return callback(true);
+        }  
     }
     
     save = (storageDir) => {
@@ -225,7 +227,8 @@ class Task {
 		console.log('Max Time:\t\t'+convertSeconds(this.settings.max_time));
 		console.log('Keywords:\t\t'+this.settings.keywords.join(', '));
 		var status = this.settings.active ? "Active" : "Not Active";
-		console.log('Status\t\t\t'+ status);
+        console.log('Status\t\t\t'+ status);
+        if (this.reportCustom) { this.reportCustom(); }
     }
     
     mostRecentSessionTime = () => {
@@ -237,15 +240,8 @@ class Task {
 convertSeconds = (seconds) => { 
     var minutes = Math.floor(seconds / 60);
     var seconds = seconds - minutes * 60;
-    return minutes.toString()+':'+pad(seconds,2 ).toString();
+    return minutes.toString()+':'+util.pad(seconds,2 ).toString();
 
 }
-
-/* Zero-pad integers for track time display */
-function pad(n, width, z) {
-    z = z || '0';
-    n = n + '';
-    return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
-  }
 
 module.exports = Task;

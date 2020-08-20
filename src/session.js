@@ -86,8 +86,7 @@ class Session {
     justGo = () => {
         console.log('Just going!');
         var mostRecentTime = this.getMostRecentSession();
-        console.log(mostRecentTime);
-        console.log(util.nowInSeconds());
+        console.log('Most recent practice was '+new Date(mostRecentTime*1000).toString());
         if ( mostRecentTime < util.nowInSeconds() - 43200 && this.warmups.length != 0 ) {
             var warmup = this.getLeastRecentlyPracticed(this.warmups)[0];
             warmup.randomizeSessionTime();
@@ -96,6 +95,7 @@ class Session {
                 this.unlimitedTasks();
             })
         }  else {
+            console.log('Skipping warmups.')
             this.unlimitedTasks();
         }
     }
@@ -104,11 +104,17 @@ class Session {
         var possibleTasks = this.getLeastRecentlyPracticed(this.nonWarmupTasks);
         var nextTask = possibleTasks[0];
         nextTask.randomizeSessionTime();
-        nextTask.start( () => {
-            nextTask.save(this.storageDir);   
-            this.unlimitedTasks();     
-        });
+        nextTask.start( (accepted) => {
+            if ( accepted ) { 
+                console.log('saving')
+                nextTask.save(this.storageDir);   
+                this.unlimitedTasks();    
+                } else {
+                this.whenFinished();
+            }
+    });
     }
+
 
     organizeSession = (seconds) => {
         
@@ -206,7 +212,7 @@ class Session {
                 var nextTask = tasksByLength[i];
                 if (nextTask.settings.min_time < seconds - this.totalSessionTime()) {
                     this.sessionTasklist.push(nextTask);
-                    nextTime.this_time = nextTask.settins.min_time;
+                    nextTime.this_time = nextTask.settings.min_time;
                 }
                 i++;
             }
@@ -334,21 +340,12 @@ sortTasksByKeyword = (tasks) => {
     return sortedTasks;
 }
 
-
-
 convertSeconds = (seconds) => { 
     var minutes = Math.floor(seconds / 60);
     var seconds = seconds - minutes * 60;
-    return minutes.toString()+':'+pad(seconds,2 ).toString();
+    return minutes.toString()+':'+util.pad(seconds,2 ).toString();
 
 }
-
-/* Zero-pad integers for track time display */
-function pad(n, width, z) {
-    z = z || '0';
-    n = n + '';
-    return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
-  }
 
 
 // https://stackoverflow.com/questions/6274339/how-can-i-shuffle-an-array
