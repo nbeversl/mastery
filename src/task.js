@@ -129,15 +129,15 @@ class Task {
 
     questions() { return }
 
-    start()  {
-        console.log('Task: '+this.settings.name+' for '+convertSeconds(this.this_time));
+    start(callback)  {
+        console.log('Task: '+this.settings.name+' for '+util.convertSeconds(this.this_time));
         util.sayThing(this.settings.name + '. Press enter when ready to begin, or q to stop.', () => {            
             var wait = prompt('Press enter');
             if (wait == 'q') {
                 return false
             }
             this.start_time = util.nowInSeconds();
-            return this.practiceRoutine(this.this_time);
+            return this.practiceRoutine(this.this_time, callback);
         });
     }
 
@@ -191,8 +191,8 @@ class Task {
                 return this.checkCompletion();
             }
             this.status.next_time = nextTime * 60;
-            return callback(true);
         }  
+        return callback(true);
     }
     
     save = (storageDir) => {
@@ -219,12 +219,12 @@ class Task {
         if (this.status.time_to_done) {
             console.log('Time Remaining:\t\t'+this.status.time_to_done.join(', '));
         }
-		console.log('Total time_practiced:\t'+convertSeconds(this.timePracticed()));
+		console.log('Total time_practiced:\t'+util.convertSeconds(this.timePracticed()));
         console.log('Last Practiced:\t\t' + 
                 ( this.status.sessions.length == 1 ? 'never' 
                 : new Date(this.status.sessions[this.status.sessions.length-1][0])).toString());
-		console.log('Min Time:\t\t'+convertSeconds(this.settings.min_time));
-		console.log('Max Time:\t\t'+convertSeconds(this.settings.max_time));
+		console.log('Min Time:\t\t'+util.convertSeconds(this.settings.min_time));
+		console.log('Max Time:\t\t'+util.convertSeconds(this.settings.max_time));
 		console.log('Keywords:\t\t'+this.settings.keywords.join(', '));
 		var status = this.settings.active ? "Active" : "Not Active";
         console.log('Status\t\t\t'+ status);
@@ -237,11 +237,5 @@ class Task {
 
 }
 
-convertSeconds = (seconds) => { 
-    var minutes = Math.floor(seconds / 60);
-    var seconds = seconds - minutes * 60;
-    return minutes.toString()+':'+util.pad(seconds,2 ).toString();
-
-}
 
 module.exports = Task;

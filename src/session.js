@@ -45,8 +45,10 @@ class Session {
                 return this.whenFinished();
             }
 
-            console.log('Session length is ' + convertSeconds(this.totalSessionTime()));
+            console.log('Session length is ' + util.convertSeconds(this.totalSessionTime()));
+            
             this.runTask(0);
+             
         } 
         
         // Otherwise just start tasks
@@ -112,7 +114,7 @@ class Session {
                 } else {
                 this.whenFinished();
             }
-    });
+        });
     }
 
 
@@ -245,17 +247,21 @@ class Session {
     }
 
     runTask = (i) => {
-        this.sessionTasklist[i].start( () => { 
-            this.sessionTasklist[i].save(this.storageDir);
-            i +=1;
-            if (i == this.sessionTasklist.length) { 
-                this.reminders.forEach( (reminder) => {
-                    reminder.stopReminding();
-                });
-                return this.whenFinished();             
-            }
-            this.runTask(i);         
+
+        var nextTask =  this.sessionTasklist[i];
+        nextTask.randomizeSessionTime();
+        nextTask.start( (accepted) => {
+            if ( accepted ) { 
+                console.log('saving')
+                nextTask.save(this.storageDir);   
+                this.unlimitedTasks();    
+                i++;
+                this.runTask(i+1);
+                } else {
+                    this.whenFinished();
+                }
         });
+        
     }
 
     getMostRecentSession = () => {
@@ -292,7 +298,7 @@ class Session {
     listSession = () => {
         console.log(' SESSION: --------------------------')
 		this.sessionTasklist.forEach( (task) => {
-			console.log(task.settings.name+ ' : ' + convertSeconds(task.this_time));
+			console.log(task.settings.name+ ' : ' + util.convertSeconds(task.this_time));
         });
         console.log('------------------------------------')
     }
@@ -338,13 +344,6 @@ sortTasksByKeyword = (tasks) => {
     });
 
     return sortedTasks;
-}
-
-convertSeconds = (seconds) => { 
-    var minutes = Math.floor(seconds / 60);
-    var seconds = seconds - minutes * 60;
-    return minutes.toString()+':'+util.pad(seconds,2 ).toString();
-
 }
 
 

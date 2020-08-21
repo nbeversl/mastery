@@ -21,7 +21,7 @@ sayThing = (message, callback) => {
         });
 }
 
-/* Zero-pad integers for track time display */
+/* Zero-pad second integers for track time display */
 function pad(n, width, z) {
     z = z || '0';
     n = n + '';
@@ -29,4 +29,11 @@ function pad(n, width, z) {
   }
 
 
-module.exports = { nowInSeconds, sayThing, pad };
+convertSeconds = (seconds) => { 
+    var minutes = Math.floor(seconds / 60);
+    var seconds = seconds - minutes * 60;
+    return minutes.toString()+':'+pad(seconds,2 ).toString();
+
+}
+
+module.exports = { nowInSeconds, sayThing, pad, convertSeconds};

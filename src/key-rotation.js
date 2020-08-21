@@ -62,7 +62,7 @@ class KeyRotation extends Task {
 
     start(callback)  {
         
-        console.log('Task: '+this.settings.name+' in the key of ' + keys[this.currentKey] +' for '+convertSeconds(this.this_time));
+        console.log('Task: '+this.settings.name+' in the key of ' + keys[this.currentKey] +' for '+ util.convertSeconds(this.this_time));
         util.sayThing(this.settings.name + ' in the key of ' + keys[this.currentKey] + '. Press enter when ready to begin.', () => {            
             var wait = prompt('Press enter');
             if (wait == 'q') {

@@ -59,7 +59,7 @@ class Reminder {
     report = () => {
         console.log('Reminder Name:\t\t' +this.settings['name']);
 		console.log('Active:\t\t\t'+this.settings.active);
-		console.log('Frequency:\t\t'+convertSeconds(this.settings.frequency));
+		console.log('Frequency:\t\t'+util.convertSeconds(this.settings.frequency));
 		console.log('Message\:\t\t'+(this.settings.message));
     }
 
